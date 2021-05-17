@@ -19,7 +19,7 @@ lr = 0.0001
 noise_dim = 128
 in_size = 784
 batch_size = 64
-epochs = 70
+epochs = 50
 
 #initialize disc and gen models
 disc = Discriminator(in_size).to(device)
