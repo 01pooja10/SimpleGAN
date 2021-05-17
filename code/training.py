@@ -83,7 +83,7 @@ for epoch in range(epochs):
                 board_fake.add_image('MNIST FAKE IMAGES',fake_grid,global_step=step)
                 board_real.add_image('MNIST REAL IMAGES',real_grid,global_step=step)
 
-                step = step + 1
+                step+=1
 
 print('Final loss for D: ',dloss)
 print('Final loss for G: ',gloss)
