@@ -5,16 +5,17 @@ import torch.nn as nn
 #discriminator model
 class Discriminator(nn.Module):
     def __init__(self,in_size):
-        super.__init__()
-        self.dmodel = nn.Sequential(nn.Linear(in_size,512),
+        super().__init__()
+        self.dmodel = nn.Sequential(
+                        nn.Linear(in_size,512),
                         nn.LeakyReLU(0.2),
-                        nn.Dropout(0.3)
+                        nn.Dropout(0.3),
                         nn.Linear(512,256),
                         nn.LeakyReLU(0.2),
-                        nn.Dropout(0.3)
+                        nn.Dropout(0.3),
                         nn.Linear(256,128),
                         nn.LeakyReLU(0.2),
-                        nn.Dropout(0.3)
+                        nn.Dropout(0.3),
                         nn.Linear(128,1),
                         nn.Sigmoid())
     def forward(self,x):
@@ -24,8 +25,9 @@ class Discriminator(nn.Module):
 #generator model
 class Generator(nn.Module):
     def __init__(self,noise_dim,in_size):
-        super.__init__()
-        self.gmodel = nn.Sequential(nn.Linear(noise_dim,128),
+        super().__init__()
+        self.gmodel = nn.Sequential(
+                        nn.Linear(noise_dim,128),
                         nn.LeakyReLU(0.2),
                         nn.Linear(128,256),
                         nn.LeakyReLU(0.2),
