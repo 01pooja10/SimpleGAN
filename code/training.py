@@ -7,19 +7,23 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from model import Discriminator, Generator
 from torch.optim import Adam
+from torch.cuda.amp import autocast, GradScaler
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import make_grid
 import warnings
 warnings.filterwarnings('ignore')
 
 #hyperparameters
+'''
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
+'''
+device = 'cuda'
 lr = 0.0001
 noise_dim = 128
 in_size = 784
 batch_size = 64
-epochs = 50
+epochs = 20
 
 #initialize disc and gen models
 disc = Discriminator(in_size).to(device)
@@ -35,14 +39,18 @@ transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize((0.5,
 data = datasets.MNIST(root=r'dataset/',download=False,transform=transform)
 train = DataLoader(data,batch_size=batch_size,shuffle=True)
 
+#initialize the gradient scaler
+dscaler = GradScaler()
+gscaler = GradScaler()
+
 #optimizer
 optim_disc = Adam(disc.parameters(), lr=lr)
 optim_gen = Adam(gen.parameters(), lr=lr)
 criterion = nn.BCELoss()
 
 #tensorboard
-board_fake = SummaryWriter(f'run/fake')
-board_real = SummaryWriter(f'run/real')
+board_fake = SummaryWriter(f'logs/fake images')
+board_real = SummaryWriter(f'logs/real images')
 step = 0
 
 print('Starting the training process: ')
@@ -52,23 +60,30 @@ for epoch in range(epochs):
         batch_size = real.shape[0]
         noise = noise.to(device)
         fake = gen(noise)
-
+        '''
+        training in mixed precision
+        using amp
+        '''
         #discriminator
-        dreal = disc(real).view(-1)
-        dloss_real = criterion(dreal,torch.ones_like(dreal))
-        dfake = disc(fake).view(-1)
-        dloss_fake = criterion(dfake,torch.zeros_like(dfake))
-        dloss = (dloss_fake + dloss_real)/2
+        with autocast():
+            dreal = disc(real).view(-1)
+            dloss_real = criterion(dreal,torch.ones_like(dreal))
+            dfake = disc(fake).view(-1)
+            dloss_fake = criterion(dfake,torch.zeros_like(dfake))
+            dloss = (dloss_fake + dloss_real)/2
         disc.zero_grad()
-        dloss.backward(retain_graph=True)
-        optim_disc.step()
+        dscaler.scale(dloss).backward(retain_graph=True)
+        dscaler.step(optim_disc)
+        dscaler.update()
 
         #generator
-        gout = disc(fake).view(-1)
-        gloss = criterion(gout,torch.ones_like(gout))
+        with autocast():
+            gout = disc(fake).view(-1)
+            gloss = criterion(gout,torch.ones_like(gout))
         gen.zero_grad()
-        gloss.backward()
-        optim_gen.step()
+        gscaler.scale(gloss).backward()
+        gscaler.step(optim_gen)
+        gscaler.update()
 
         #print loss values
         if idx == 0:
@@ -83,7 +98,7 @@ for epoch in range(epochs):
                 board_fake.add_image('MNIST FAKE IMAGES',fake_grid,global_step=step)
                 board_real.add_image('MNIST REAL IMAGES',real_grid,global_step=step)
 
-                step+=1
+                step += 1
 
 print('Final loss for D: ',dloss)
 print('Final loss for G: ',gloss)
