@@ -17,7 +17,7 @@ class Discriminator(nn.Module):
                         nn.LeakyReLU(0.2),
                         nn.Dropout(0.3),
                         nn.Linear(128,1))
-                        #nn.Sigmoid())
+
     def forward(self,x):
         out = self.dmodel(x)
         return out
@@ -33,8 +33,8 @@ class Generator(nn.Module):
                         nn.LeakyReLU(0.2),
                         nn.Linear(256,512),
                         nn.LeakyReLU(0.2),
-                        nn.Linear(512,in_size),
-                        nn.Tanh())
+                        nn.Linear(512,in_size))
+                        
     def forward(self,x):
         out = self.gmodel(x)
         return out
