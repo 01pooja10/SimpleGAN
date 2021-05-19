@@ -46,7 +46,7 @@ gscaler = GradScaler()
 #optimizer
 optim_disc = Adam(disc.parameters(), lr=lr)
 optim_gen = Adam(gen.parameters(), lr=lr)
-criterion = nn.BCELoss()
+criterion = nn.BCEWithLogitsLoss()
 
 #tensorboard
 board_fake = SummaryWriter(f'logs/fake images')
