@@ -46,7 +46,7 @@ Hence the Generative Adversarial Network has been reimplemented successfully.
 Pooja Ravi
 
 <p align="center">
-<img src = "https://avatars3.githubusercontent.com/u/66198904?s=460&u=06bd3edde2858507e8c42569d76d61b3491243ad&v=4"  height="120" alt="Ansh Sharma">
+<img src = "https://avatars3.githubusercontent.com/u/66198904?s=460&u=06bd3edde2858507e8c42569d76d61b3491243ad&v=4"  height="120" alt="Pooja Ravi">
 </p>
 <p align="center">
 <a href = "https://github.com/01pooja10"><img src = "http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="36" height = "36"/></a>
